@@ -7,7 +7,7 @@ fn main() {
     // Access command-line arguments as a vector of strings
     let args: Vec<String> = env::args().collect();
 
-    // Check preconditions
+    // Check that the Azure CLI is installed
     match check_preconditions() {
         Ok(_) => {
             // Azure CLI is installed, proceed with other checks
