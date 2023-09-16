@@ -1,9 +1,7 @@
 use std::env;
 use std::process::{ Command };
-
-extern crate json;
-
 mod azure;
+extern crate json;
 
 const AZURE_CLI_PATH: &str = "C:\\Program Files\\Microsoft SDKs\\Azure\\CLI2\\wbin\\az.cmd";
 
@@ -37,7 +35,7 @@ fn main() {
                     azure::auth::logout();
                 }
                 "subscriptions" => {
-                    azure_get_subscriptions();
+                    azure::subscriptions::list();
                 }
                 _ => {
                     println!("Unknown action: {}", action);
@@ -58,22 +56,6 @@ fn print_usage() {
     println!("  login - Log in to Azure");
     println!("  logout - Log out of Azure");
     println!("  subscriptions - List available subscriptions");
-}
-
-fn azure_get_subscriptions() {
-    println!("Getting subscriptions...");
-    let output = Command::new(AZURE_CLI_PATH)
-        .arg("account")
-        .arg("list")
-        .output()
-        .expect("Failed to execute az account list");
-
-    if !output.status.success() {
-        println!("stderr: {}", String::from_utf8_lossy(&output.stderr));
-    }
-
-    let subscriptions = String::from_utf8_lossy(&output.stdout);
-    println!("Subscriptions: {}", subscriptions);
 }
 
 fn azure_check_cli() -> Result<(), String> {

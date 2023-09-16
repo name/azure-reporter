@@ -14,38 +14,75 @@ pub fn login() {
         println!("stderr: {}", String::from_utf8_lossy(&output.stderr));
     }
 
-    let user_info = String::from_utf8_lossy(&output.stdout);
+    // Get the user info from the output (strip the brackets at the start and end to make it valid JSON)
+    let user_info = &String::from_utf8_lossy(&output.stdout)[1..output.stdout.len() - 3];
 
     // Parse the JSON
     let user_info_json = json::parse(&user_info);
 
-    match user_info_json {
-        Ok(json::JsonValue::Array(mut user_info_array)) => {
-            if let Some(user_obj) = user_info_array.pop() {
-                // Access additional fields as needed
-                if let Some(name) = user_obj["user"]["name"].as_str() {
-                    println!("User Name: {}", name);
-                } else {
-                    println!("User name not found in JSON.");
-                }
-
-                if let Some(cloud_name) = user_obj["cloudName"].as_str() {
-                    println!("Cloud Name: {}", cloud_name);
-                } else {
-                    println!("Cloud name not found in JSON.");
-                }
-
-                // Access more fields in a similar manner
+    let username = match user_info_json {
+        Ok(json::JsonValue::Object(ref user_info)) => {
+            if let Some(name) = user_info["user"]["name"].as_str() {
+                name.to_string() // Clone the name
             } else {
-                println!("Empty JSON array.");
+                println!("Username not found in JSON.");
+                return;
             }
         }
-        _ => {
+        Ok(_) => {
             println!("Invalid JSON structure.");
+            return;
         }
-    }
+        Err(err) => {
+            println!("Error parsing JSON: {}", err);
+            return;
+        }
+    };
 
-    println!("Login complete.");
+    let subscription_name = match user_info_json {
+        Ok(json::JsonValue::Object(ref user_info)) => {
+            if let Some(subscription) = user_info["name"].as_str() {
+                subscription.to_string() // Clone the subscription
+            } else {
+                println!("Subscription not found in JSON.");
+                return;
+            }
+        }
+        Ok(_) => {
+            println!("Invalid JSON structure.");
+            return;
+        }
+        Err(err) => {
+            println!("Error parsing JSON: {}", err);
+            return;
+        }
+    };
+
+    let subscription_id = match user_info_json {
+        Ok(json::JsonValue::Object(ref user_info)) => {
+            if let Some(subscription) = user_info["id"].as_str() {
+                subscription.to_string() // Clone the subscription
+            } else {
+                println!("Subscription not found in JSON.");
+                return;
+            }
+        }
+        Ok(_) => {
+            println!("Invalid JSON structure.");
+            return;
+        }
+        Err(err) => {
+            println!("Error parsing JSON: {}", err);
+            return;
+        }
+    };
+
+    println!(
+        "You are logged in as {} to subscription '{}' ({})",
+        username,
+        subscription_name,
+        subscription_id
+    );
 }
 
 pub fn logout() {
@@ -88,6 +125,73 @@ pub fn whoami() {
         return;
     }
 
+    // Get the user info from the output
     let user_info = String::from_utf8_lossy(&output.stdout);
-    println!("User Info: {}", user_info);
+
+    // Parse the JSON
+    let user_info_json = json::parse(&user_info);
+
+    let username = match user_info_json {
+        Ok(json::JsonValue::Object(ref user_info)) => {
+            if let Some(name) = user_info["user"]["name"].as_str() {
+                name.to_string() // Clone the name
+            } else {
+                println!("Username not found in JSON.");
+                return;
+            }
+        }
+        Ok(_) => {
+            println!("Invalid JSON structure.");
+            return;
+        }
+        Err(err) => {
+            println!("Error parsing JSON: {}", err);
+            return;
+        }
+    };
+
+    let subscription_name = match user_info_json {
+        Ok(json::JsonValue::Object(ref user_info)) => {
+            if let Some(subscription) = user_info["name"].as_str() {
+                subscription.to_string() // Clone the subscription
+            } else {
+                println!("Subscription not found in JSON.");
+                return;
+            }
+        }
+        Ok(_) => {
+            println!("Invalid JSON structure.");
+            return;
+        }
+        Err(err) => {
+            println!("Error parsing JSON: {}", err);
+            return;
+        }
+    };
+
+    let subscription_id = match user_info_json {
+        Ok(json::JsonValue::Object(ref user_info)) => {
+            if let Some(subscription) = user_info["id"].as_str() {
+                subscription.to_string() // Clone the subscription
+            } else {
+                println!("Subscription not found in JSON.");
+                return;
+            }
+        }
+        Ok(_) => {
+            println!("Invalid JSON structure.");
+            return;
+        }
+        Err(err) => {
+            println!("Error parsing JSON: {}", err);
+            return;
+        }
+    };
+
+    println!(
+        "You are logged in as {} to subscription '{}' ({})",
+        username,
+        subscription_name,
+        subscription_id
+    );
 }
